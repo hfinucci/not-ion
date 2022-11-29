@@ -39,16 +39,33 @@
 			"response": []
 		},
 		{
-			"name": "New Request",
+			"name": "http://localhost:8000/dashboard",
 			"id": "c1ac765d-8190-466c-9bd5-55cfc0b1ec98",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
 			"request": {
-				"method": "GET",
+				"method": "POST",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": ""
+					"raw": "http://localhost:8000/dashboard",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"dashboard"
+					]
 				}
 			},
 			"response": []
