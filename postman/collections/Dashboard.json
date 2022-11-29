@@ -1,0 +1,54 @@
+{
+	"info": {
+		"_postman_id": "62c9175d-4aca-48da-807e-14dbcfeb39d3",
+		"name": "Dashboard",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_uid": "23358969-62c9175d-4aca-48da-807e-14dbcfeb39d3"
+	},
+	"item": [
+		{
+			"name": "http://localhost:8000/dashboard",
+			"id": "e6cdae30-0f4a-494b-9284-411835ce3c61",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"type\": \"h2\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8000/dashboard",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"dashboard"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"id": "30d2edf2-5fc1-44af-8a9d-a0d3caed5f35",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}
