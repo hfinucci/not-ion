@@ -1,9 +1,42 @@
 import express, { Express, Request, Response } from 'express'
-const port = 8000
-const app: Express = express()
+import DashboardPersistence from "./database/dashboardPersistence";
+import validTypes from "./utils";
 
-app.get('/', (req, res) => {
-    res.send("que haces mundo")
+const app: Express = express()
+const port = 8000
+const bodyParser = require('body-parser');
+app.use(bodyParser.json())
+
+
+app.post('/dashboard', async (req, res) => {
+    await DashboardPersistence.createDashboard()
+    res.sendStatus(200)
+})
+
+app.get('/dashboard', async (req, res) => {
+    const result = await DashboardPersistence.getDashboard()
+    res.send(result)
+})
+
+app.post('/blocks', async (req, res) => {
+    // TODO manejo de logica con mongo
+    if (validTypes.includes(req.body.type)) {
+        await DashboardPersistence.incrementValue(req.body.type, 1)
+    } else {
+        res.sendStatus(400)
+        return
+    }
+    res.sendStatus(200)
+})
+
+app.delete('/blocks', async (req, res) => {
+    if (validTypes.includes(req.body.type)) {
+        await DashboardPersistence.incrementValue(req.body.type, -1)
+    } else {
+        res.sendStatus(400)
+        return
+    }
+    res.sendStatus(200)
 })
 
 app.listen(port, () => {
