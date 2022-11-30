@@ -1,0 +1,41 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "not-ion",
+        "description": "Swagger documentation on not-ion API"
+    },
+    "host": "localhost:8000",
+    "basePath": "/",
+    "schemes": ["http"],
+    "tags": [
+        {
+            "name": "Dashboard",
+            "description": "API calls for Dashboard"
+        }
+    ],
+    "paths": {
+        "/dashboard":{
+            "post": {
+                "tags": ["Dashboard"],
+                "description": "Create a new dashboard",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "Dashboard created"
+                    }
+                }
+            },
+            "get": {
+                "tags": ["Dashboard"],
+                "description": "Get dashboard",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "Dashboards retrieved"
+                    }
+                }
+            }
+        }
+    }
+}
