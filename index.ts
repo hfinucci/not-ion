@@ -5,6 +5,7 @@ import swaggerUi from "swagger-ui-express";
 import * as swaggerDocument from "./swagger.json";
 import BlockPersistence from "./database/BlockPersistence";
 import { TextValidator, CalloutValidator } from "./schemaValidation";
+import PagePersistence from "./database/PagePersistence";
 
 const app: Express = express();
 const port = 8000;
@@ -25,8 +26,8 @@ app.post("/blocks", async (req, res) => {
 
   try {
     const validatorResponse = TextValidator.parse(req.body)
-  } catch(err) {
-    console.log("validation error")
+  } catch(err: any) {
+    console.log("validation error: ", err.message)
     res.sendStatus(400)
     return
   }
@@ -54,18 +55,17 @@ app.post("/blocks", async (req, res) => {
   res.sendStatus(200);
 });
 
-// app.get("/blocks", async (req, res) => {
-//   try {
-//     const result = await BlockPersistence.getBlock(req);
-//     res.sendStatus(200);
-//     res.send(result);
-//     return result;
-//   } catch (err) {
-//     console.log("error en el try/catch 3")
-//     res.sendStatus(500)
-//     return
-//   }
-// });
+app.get("/blocks", async (req, res) => {
+  let result
+  try {
+    result = await BlockPersistence.getBlock(req);
+  } catch (err: any) {
+    console.log("error en el try/catch 3: ", err.message)
+    res.sendStatus(500)
+    return
+  }
+  res.send(result)
+});
 
 app.delete("/blocks", async (req, res) => {
 
@@ -86,6 +86,21 @@ app.delete("/blocks", async (req, res) => {
 
   res.sendStatus(200);
 });
+
+app.post("/pages", async (req, res) => {
+  if (req.body.type == "page") {
+    try {
+      await PagePersistence.createPage(req.body)
+    } catch(err: any) {
+      console.log("error en el try/catch 1: ", err.message)
+      res.sendStatus(500)
+      return
+    }
+  } else {
+    res.sendStatus(400);
+    return;
+  }
+})
 
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 

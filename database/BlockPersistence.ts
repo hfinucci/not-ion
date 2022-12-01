@@ -49,7 +49,7 @@ export default class BlockPersistence {
   }
 
   static async getBlock(json: object) {
-    return await BlockPersistence.block.findOne(json)
+    return await BlockPersistence.block.findOne(json).exec()
   }
 
   static async deleteBlock(json: object) {

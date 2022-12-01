@@ -7,7 +7,6 @@ export default class PagePersistence {
         type: {
             type: String,
             required: true,
-            match: "page"
         },
         properties: {
             title: {
@@ -21,7 +20,7 @@ export default class PagePersistence {
                 type: Date,
                 default: Date.now
             },
-            createdBy: {
+            created_by: {
                 type: Schema.Types.ObjectId,
                 required: true
             }
@@ -38,4 +37,10 @@ export default class PagePersistence {
     static async createPage(json: object) {
         return await PagePersistence.page.create(json)
     }
+
+    static async getPage(json: object) {
+        return await PagePersistence.page.findOne(json)
+    }
+
+
 }
