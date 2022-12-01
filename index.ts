@@ -1,8 +1,10 @@
-import express, { Express, Request, Response } from "express";
+import express, { Express } from "express";
 import DashboardPersistence from "./database/dashboardPersistence";
 import validTypes from "./utils";
 import swaggerUi from "swagger-ui-express";
 import * as swaggerDocument from "./swagger.json";
+import BlockPersistence from "./database/BlockPersistence";
+import { TextValidator, CalloutValidator } from "./schemaValidation";
 
 const app: Express = express();
 const port = 8000;
@@ -20,9 +22,31 @@ app.get("/dashboard", async (req, res) => {
 });
 
 app.post("/blocks", async (req, res) => {
-  // TODO manejo de logica con mongo
+
+  try {
+    const validatorResponse = TextValidator.parse(req.body)
+  } catch(err) {
+    console.log("validation error")
+    res.sendStatus(400)
+    return
+  }
+
   if (validTypes.includes(req.body.type)) {
-    await DashboardPersistence.incrementValue(req.body.type, 1);
+    try {
+      await BlockPersistence.createBlock(req.body)
+    } catch(err) {
+      console.log("error en el try/catch 1")
+      res.sendStatus(500)
+      return
+    }
+
+    try {
+      await DashboardPersistence.incrementValue(req.body.type, 1)
+    } catch(err) {
+      console.log("error en el try/catch 2")
+      res.sendStatus(500)
+      return
+    }
   } else {
     res.sendStatus(400);
     return;
@@ -30,13 +54,36 @@ app.post("/blocks", async (req, res) => {
   res.sendStatus(200);
 });
 
+// app.get("/blocks", async (req, res) => {
+//   try {
+//     const result = await BlockPersistence.getBlock(req);
+//     res.sendStatus(200);
+//     res.send(result);
+//     return result;
+//   } catch (err) {
+//     console.log("error en el try/catch 3")
+//     res.sendStatus(500)
+//     return
+//   }
+// });
+
 app.delete("/blocks", async (req, res) => {
-  if (validTypes.includes(req.body.type)) {
-    await DashboardPersistence.incrementValue(req.body.type, -1);
-  } else {
-    res.sendStatus(400);
-    return;
+
+  try {
+    let block = await BlockPersistence.deleteBlock(req.body)
+    try {
+      await DashboardPersistence.incrementValue(block.type, -1)
+    } catch (err) {
+      console.log("error en el try/catch 3")
+      res.sendStatus(500)
+      return
+    }
+  } catch(err: any) {
+    console.log("error en el try/catch 1", err.message)
+    res.sendStatus(500)
+    return
   }
+
   res.sendStatus(200);
 });
 
