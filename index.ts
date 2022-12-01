@@ -88,18 +88,47 @@ app.delete("/blocks", async (req, res) => {
 });
 
 app.post("/pages", async (req, res) => {
+  console.log("en el resquest")
   if (req.body.type == "page") {
     try {
+      console.log("adentro del try, antes de create")
       await PagePersistence.createPage(req.body)
+      console.log("despues del create")
     } catch(err: any) {
       console.log("error en el try/catch 1: ", err.message)
       res.sendStatus(500)
       return
     }
+    res.sendStatus(200)
   } else {
     res.sendStatus(400);
     return;
   }
+})
+
+app.get("/pages", async (req, res) => {
+  let result
+  try {
+    result = await PagePersistence.getPage(req);
+  } catch (err: any) {
+    console.log("error en el try/catch: ", err.message)
+    res.sendStatus(500)
+    return
+  }
+  res.send(result)
+})
+
+app.delete("/pages", async (req, res) => {
+  try {
+    let page = await PagePersistence.deletePage(req.body)
+    console.log(page)
+  } catch (err: any) {
+    console.log(err.message)
+    res.sendStatus(500)
+    return
+  }
+
+  res.sendStatus(200);
 })
 
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));

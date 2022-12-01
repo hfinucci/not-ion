@@ -35,6 +35,7 @@ export default class PagePersistence {
     static page = mongoose.model("page", this.pageSchema)
 
     static async createPage(json: object) {
+        console.log("en el create")
         return await PagePersistence.page.create(json)
     }
 
@@ -42,5 +43,8 @@ export default class PagePersistence {
         return await PagePersistence.page.findOne(json)
     }
 
-
+    static async deletePage(json: object) {
+        return PagePersistence.page.findOneAndDelete(json,
+        ).clone()
+    }
 }
