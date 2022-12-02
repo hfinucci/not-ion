@@ -43,6 +43,10 @@ export default class PagePersistence {
         return await PagePersistence.page.findOne(json)
     }
 
+    static async getPages() {
+        return await PagePersistence.page.find()
+    }
+
     static async deletePage(json: object) {
         return PagePersistence.page.findOneAndDelete(json,
         ).clone()
@@ -52,11 +56,9 @@ export default class PagePersistence {
         return PagePersistence.page.updateOne(json, {$push: {content: id}})
     }
 
-    static async updatePage(json_id: any) {
-        let json = {"properties.title": "chau", "properties.icon": "icono"}
-        const variable = await PagePersistence.page.updateOne(json_id, {$set: json})
-        console.log(variable)
-        return variable
+    static async updatePage(id: any, json: any) {
+        const res = Object.fromEntries(Object.entries(json).map(([key, value]) => ['properties.'+key, value]));
+        return  await PagePersistence.page.updateOne(id, {$set: res})
     }
 
 }
