@@ -15,7 +15,7 @@ const PageValidator = z.object({
     properties: z.object({
         title: z.string(),
         icon: z.string(),
-        created: z.date(),
+        // created: z.date(),
         created_by: z.string()
     }),
     content: z.array(z.string())
