@@ -97,7 +97,7 @@ app.get("/blocks/:blockId", async (req, res) => {
     if (result == null) {
         res.sendStatus(204)
     } else {
-        res.status(200).send(result)
+        res.status(200)
     }
 });
 
@@ -110,7 +110,7 @@ app.put("/blocks/:blockId", validateUpdateBlockRequest(), async (req, res) => {
         res.sendStatus(500)
         return
     }
-    res.status(200).send(result)
+    res.status(200)
 });
 
 app.delete("/blocks/:blockId", async (req, res) => {
