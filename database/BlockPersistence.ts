@@ -34,17 +34,21 @@ export default class BlockPersistence {
     content: [String],
     value: String,
     parent: {
-      type: Schema.Types.ObjectId,
-      required: true,
-    },
+      id: {
+            type: Schema.Types.ObjectId,
+            required: true
+          },
+      type: {
+        type: String,
+        required: true
+      }
+    }
   });
 
   // Models
   static block = mongoose.model("block", this.blockSchema);
 
   static async createBlock(json: object) {
-    console.log(json)
-    console.log("==================")
     return await BlockPersistence.block.create(json)
   }
 

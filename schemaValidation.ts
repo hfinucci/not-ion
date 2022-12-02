@@ -11,7 +11,10 @@ const TextValidator = z.object({
             highlight: HIGHLIGHT_COLORS
         }),
         value: z.string(),
-        parent: z.string().min(24).max(24)
+        parent: z.object({
+            id: z.string().min(24).max(24),
+            type: z.string()
+        })
     }
 )
 
@@ -24,7 +27,10 @@ const CalloutValidator = z.object({
             icon: z.string()
         }),
         value: z.string(),
-        parent: z.string().min(24).max(24)
+        parent: z.object({
+            id: z.string().min(24).max(24),
+            type: z.string()
+        })
     }
 )
 
@@ -37,7 +43,10 @@ const ListValidator = z.object({
     }),
     content: z.array(z.string()),
     value: z.string(),
-    parent: z.string().min(24).max(24)
+    parent: z.object({
+        id: z.string().min(24).max(24),
+        type: z.string()
+    })
 })
 
 const TodoValidator = z.object({
@@ -50,6 +59,32 @@ const TodoValidator = z.object({
     }),
     content: z.array(z.string()),
     value: z.string(),
-    parent: z.string().min(24).max(24)
+    parent: z.object({
+        id: z.string().min(24).max(24),
+        type: z.string()
+    })
 })
-export { TextValidator, CalloutValidator, ListValidator, TodoValidator }
+
+const ImageValidator = z.object({
+    type: z.string(),
+    properties: z.object({
+        caption: z.string(),
+        align: z.string(),
+    }),
+    value: z.string(),
+    parent: z.object({
+        id: z.string().min(24).max(24),
+        type: z.string()
+    })
+})
+
+const EquationValidator = z.object({
+    type: z.string(),
+    value: z.string(),
+    parent: z.object({
+        id: z.string().min(24).max(24),
+        type: z.string()
+    })
+})
+
+export {TextValidator, CalloutValidator, ListValidator, TodoValidator, ImageValidator, EquationValidator}

@@ -1,5 +1,5 @@
 import redisClient from "./redisconfig";
-import validTypes from "../utils";
+import { validTypes }from "../utils";
 
 
 export default class DashboardPersistence {

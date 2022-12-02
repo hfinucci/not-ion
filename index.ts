@@ -1,6 +1,6 @@
 import express, { Express } from "express";
 import DashboardPersistence from "./database/dashboardPersistence";
-import validTypes from "./utils";
+import {validatorHash, validTypes} from "./utils";
 import swaggerUi from "swagger-ui-express";
 import * as swaggerDocument from "./swagger.json";
 import BlockPersistence from "./database/BlockPersistence";
@@ -22,21 +22,14 @@ app.get("/dashboard", async (req, res) => {
   res.send(result);
 });
 
-app.post("/blocks", async (req, res) => {
-
-  try {
-    const validatorResponse = TextValidator.parse(req.body)
-  } catch(err: any) {
-    console.log("validation error: ", err.message)
-    res.sendStatus(400)
-    return
-  }
+app.post("/blocks", validateRequest(), async (req, res) => {
 
   if (validTypes.includes(req.body.type)) {
+    let block;
     try {
-      await BlockPersistence.createBlock(req.body)
-    } catch(err) {
-      console.log("error en el try/catch 1")
+      block = await BlockPersistence.createBlock(req.body)
+    } catch(err: any) {
+      console.log("error en crear el bloque: ", err.message)
       res.sendStatus(500)
       return
     }
@@ -88,14 +81,10 @@ app.delete("/blocks", async (req, res) => {
 });
 
 app.post("/pages", async (req, res) => {
-  console.log("en el resquest")
   if (req.body.type == "page") {
     try {
-      console.log("adentro del try, antes de create")
       await PagePersistence.createPage(req.body)
-      console.log("despues del create")
     } catch(err: any) {
-      console.log("error en el try/catch 1: ", err.message)
       res.sendStatus(500)
       return
     }
@@ -104,6 +93,16 @@ app.post("/pages", async (req, res) => {
     res.sendStatus(400);
     return;
   }
+})
+
+app.put("/pages", async (req, res) => {
+   try {
+        await PagePersistence.updatePage(req.body)
+    } catch(err: any) {
+        res.sendStatus(500)
+        return
+    }
+    res.sendStatus(200)
 })
 
 app.get("/pages", async (req, res) => {
@@ -118,7 +117,7 @@ app.get("/pages", async (req, res) => {
   res.send(result)
 })
 
-app.delete("/pages", async (req, res) => {
+app.delete("/pages" , async (req, res) => {
   try {
     let page = await PagePersistence.deletePage(req.body)
     console.log(page)
@@ -136,3 +135,19 @@ app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.listen(port, () => {
   console.log("listening on port 8000...");
 });
+
+
+function validateRequest() {
+  return (req: any, res: any, next: any) => {
+    if (req.body.type == undefined) {
+      return res.sendStatus(400)
+    }
+    try {
+      const validatorResponse = validatorHash.get(req.body.type)?.parse(req.body)
+    } catch(err) {
+      console.log("invalid request body mira vos")
+      return res.sendStatus(400)
+    }
+    next()
+  }
+}
