@@ -9,19 +9,70 @@
     "basePath": "/",
     "schemes": ["http"],
     "tags": [
+
+        {
+            "name": "User",
+            "description": "API calls for User"
+        },
+        {
+            "name": "Pages",
+            "description": "API calls for Pages"
+        },
+        {
+            "name": "Blocks",
+            "description": "API calls for Blocks"
+        },
         {
             "name": "Dashboard",
             "description": "API calls for Dashboard"
         }
     ],
     "paths": {
+        "/pages" : {
+            "post": {
+                "tags": ["Pages"],
+                "description": "Create a new page",
+                "parameters": [
+
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Dashboard created"
+                    }
+                }
+            }
+        },
+        "/blocks": {
+            "post": {
+                "tags": [
+                    "Blocks"
+                ],
+                "description": "Create a new block",
+                "parameters": [
+                    {
+                        "name": "block",
+                        "in": "body",
+                        "description": "block to be created",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Block"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Block created"
+                    }
+                }
+            }
+        },
         "/dashboard":{
             "post": {
                 "tags": ["Dashboard"],
                 "description": "Create a new dashboard",
                 "parameters": [],
                 "responses": {
-                    "200": {
+                    "201": {
                         "description": "Dashboard created"
                     }
                 }
@@ -37,5 +88,80 @@
                 }
             }
         }
+    },
+    "definitions": {
+        "Block": {
+            "required": [
+                "type",
+                "value",
+                "parent"
+            ],
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string"
+                },
+                "properties": {
+                    "type": "object",
+                    "properties": {
+                        "type_face": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": ["bold", "italic", "underline"]
+                            }
+                        },
+                        "color": {
+                            "type": "string",
+                            "enum": ["default", "grey", "brown", "orange", "yellow", "green", "blue", "purple", "pink", "red"]
+                        },
+                        "highlight": {
+                            "type": "string",
+                            "enum": ["default", "grey", "brown", "orange", "yellow", "green", "blue", "purple", "pink", "red"]
+                        },
+                        "icon": {
+                            "type": "string",
+                            "example": "light bulb"
+                        },
+                        "checked": {
+                            "type": "boolean",
+                            "example": true
+                        },
+                        "caption": {
+                            "type": "string",
+                            "example": "This is a caption"
+                        },
+                        "align": {
+                            "type": "string",
+                            "enum": ["left", "center", "right"]
+                        }
+                    }
+                },
+                "content": {
+                    "type": "array",
+                    "description": "Array of ids",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "value": {
+                    "type": "string",
+                    "example": "This is a value"
+                },
+                "parent": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string",
+                            "enum": ["page", "bullet", "toggle", "todo"]
+                        }
+                    }
+                }
+            }
+        }
     }
+
 }
