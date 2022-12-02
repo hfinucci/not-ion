@@ -4,7 +4,7 @@ import {blockValidatorHash, validTypes} from "./utils";
 import swaggerUi from "swagger-ui-express";
 import * as swaggerDocument from "./swagger.json";
 import BlockPersistence from "./database/BlockPersistence";
-import {TextValidator, CalloutValidator, UserValidator} from "./schemaValidation";
+import {TextValidator, CalloutValidator, UserValidator, PageValidator} from "./schemaValidation";
 import PagePersistence from "./database/PagePersistence";
 import UserPersistence from "./database/UserPersistence";
 
@@ -31,7 +31,7 @@ app.post("/users", validateUserRequest(), async (req, res) => {
     try {
         user = await UserPersistence.createUser(req.body);
     } catch (err: any) {
-        console.log("error en crear el usuario: ", err.message);
+        console.log("error creating user: ", err.message);
         res.sendStatus(500);
         return
     }
@@ -46,7 +46,7 @@ app.post("/blocks", validateBlockRequest(), authorize(), async (req, res) => {
         try {
             block = await BlockPersistence.createBlock(req.body)
         } catch (err: any) {
-            console.log("error en crear el bloque: ", err.message)
+            console.log("error creating block: ", err.message)
             res.sendStatus(500)
             return
         }
@@ -145,7 +145,7 @@ app.delete("/blocks/:blockId", async (req, res) => {
     res.sendStatus(204);
 });
 
-app.post("/pages", async (req, res) => {
+app.post("/pages", validatePageRequest(), async (req, res) => {
     if (req.body.type == "page") {
         let page;
         try {
@@ -250,6 +250,18 @@ function validateUserRequest() {
         }
         next()
     }
+}
+
+function validatePageRequest() {
+  return (req: any, res: any, next: any) => {
+    try {
+      PageValidator.parse(req.body);
+    } catch (err: any) {
+      console.log("invalid request body: ", err.message)
+      return res.sendStatus(400)
+    }
+    next()
+  }
 }
 
 function validateBlockRequest() {

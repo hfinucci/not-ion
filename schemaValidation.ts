@@ -10,6 +10,17 @@ const UserValidator = z.object({
     pages: z.array(z.string())
 })
 
+const PageValidator = z.object({
+    type: z.string().startsWith("page").max(4),
+    properties: z.object({
+        title: z.string(),
+        icon: z.string(),
+        created: z.date(),
+        created_by: z.string()
+    }),
+    content: z.array(z.string())
+})
+
 const TextValidator = z.object({
         type: z.string(),
         properties: z.object({
@@ -94,4 +105,4 @@ const EquationValidator = z.object({
     })
 })
 
-export { UserValidator, TextValidator, CalloutValidator, ListValidator, TodoValidator, ImageValidator, EquationValidator}
+export { UserValidator, PageValidator, TextValidator, CalloutValidator, ListValidator, TodoValidator, ImageValidator, EquationValidator}
