@@ -1,5 +1,7 @@
-import { Schema } from "mongoose";
+import {Schema} from "mongoose";
 import mongoose from "./mongoconfig";
+
+const bcrypt = require('bcrypt')
 
 export default class BlockPersistence {
   // Schema
@@ -46,30 +48,10 @@ export default class BlockPersistence {
     }
   });
 
-  static userSchema = new mongoose.Schema({
-    name: {
-      type: String,
-      required: true,
-    },
-    email: {
-      type: String,
-      required: true,
-    },
-    password: {
-      type: String,
-      required: true,
-    },
-    pages: [String],
-  });
 
 
   // Models
   static block = mongoose.model("block", this.blockSchema);
-  static user = mongoose.model("user", this.userSchema);
-
-  static async createUser(json: object) {
-    return await BlockPersistence.user.create(json)
-  }
 
   static async createBlock(json: object) {
     return await BlockPersistence.block.create(json)
