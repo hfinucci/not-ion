@@ -1,5 +1,7 @@
 import { Schema } from "mongoose";
 import mongoose from "./mongoconfig";
+import BlockPersistence from "./BlockPersistence";
+import DashboardPersistence from "./dashboardPersistence";
 
 export default class PagePersistence {
     // Schema
@@ -48,17 +50,34 @@ export default class PagePersistence {
     }
 
     static async deletePage(json: object) {
-        return PagePersistence.page.findOneAndDelete(json,
+        let page = await PagePersistence.page.findOneAndDelete(json,
         ).clone()
+
+        console.log("PAGE: ", page)
+
+        for(let i = 0; i < page.content.length; i++) {
+            let deleteBlock = await BlockPersistence.deleteBlock({_id: page.content[i]})
+            await DashboardPersistence.incrementValue(deleteBlock.type, -1)
+        }
+        
+        return page
     }
 
     static async addContentPage(json: object, id: Schema.Types.ObjectId) {
         return PagePersistence.page.updateOne(json, {$push: {content: id}})
     }
+    
+    static async removeContentPage(json: object, id: Schema.Types.ObjectId) {
+        return PagePersistence.page.updateOne(json, {$pull: {content: id}})
+    }
 
     static async updatePage(id: any, json: any) {
         const res = Object.fromEntries(Object.entries(json).map(([key, value]) => ['properties.'+key, value]));
         return  await PagePersistence.page.updateOne(id, {$set: res})
+    }
+
+    static async getPagesByUser(id: String) {
+        return await PagePersistence.page.find({"properties.created_by": id})
     }
 
 }

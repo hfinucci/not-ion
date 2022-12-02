@@ -115,20 +115,32 @@ app.put("/blocks/:blockId", async (req, res) => {
 
 app.delete("/blocks/:blockId", async (req, res) => {
 
+  try {
+    let block = await BlockPersistence.deleteBlock({_id: req.params.blockId})
     try {
-        let block = await BlockPersistence.deleteBlock({_id: req.params.blockId})
-        try {
-            await DashboardPersistence.incrementValue(block.type, -1)
-        } catch (err) {
-            console.log("error en el try/catch 3")
-            res.sendStatus(500)
-            return
-        }
+      await DashboardPersistence.incrementValue(block.type, -1)
     } catch (err: any) {
-        console.log("error en el try/catch 1", err.message)
-        res.sendStatus(500)
-        return
+      console.log("error updating dashboard: ", err.message)
+      res.sendStatus(500)
+      return
     }
+    try {
+      console.log("BLOCK: ", block)
+      if (block.parent.type === "page") {
+        await PagePersistence.removeContentPage({_id: block.parent.id}, block._id)
+      } else {
+        await BlockPersistence.removeContentBlock({_id: block.parent.id}, block._id)
+      }
+    } catch(err: any){
+      console.log("error en el try/catch 3", err.message)
+      res.sendStatus(500)
+      return
+    }
+  } catch(err: any) {
+    console.log("error en el try/catch 1", err.message)
+    res.sendStatus(500)
+    return
+  }
 
     res.sendStatus(204);
 });
@@ -204,6 +216,22 @@ app.delete("/pages/:pageId", async (req, res) => {
     }
 
     res.sendStatus(204);
+})
+
+app.get("/pages/user/:userId", async (req, res) => {
+    let result
+    try {
+        result = await PagePersistence.getPagesByUser(req.params.userId)
+    } catch (err: any) {
+        console.log(err.message)
+        res.sendStatus(500)
+        return
+    }
+    if (result == null || result.length == 0) {
+        res.sendStatus(204)
+    } else {
+        res.status(200).send(result)
+    }
 })
 
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
