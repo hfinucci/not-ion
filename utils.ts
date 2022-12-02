@@ -5,6 +5,11 @@ import {
     ListValidator,
     TextValidator,
     TodoValidator,
+    UpdateCalloutValidator, UpdateEquationValidator,
+    UpdateImageValidator,
+    UpdateListValidator,
+    UpdateTextValidator,
+    UpdateTodoValidator,
 } from "./schemaValidation";
 import {ZodObject} from "zod";
 
@@ -24,5 +29,19 @@ const blockValidatorHash = new Map<string, ZodObject<any>>([
     ["equation", EquationValidator]
 ])
 
+const blockUpdateValidatorHash = new Map<string, ZodObject<any>>([
+    ["text", UpdateTextValidator],
+    ["h1", UpdateTextValidator],
+    ["h2", UpdateTextValidator],
+    ["h3", UpdateTextValidator],
+    ["quote", UpdateTextValidator],
+    ["callout", UpdateCalloutValidator],
+    ["bullet", UpdateListValidator],
+    ["toggle", UpdateListValidator],
+    ["todo", UpdateTodoValidator],
+    ["image", UpdateImageValidator],
+    ["equation", UpdateEquationValidator]
+])
 
-export { validTypes, blockValidatorHash }
+
+export { validTypes, blockValidatorHash, blockUpdateValidatorHash }

@@ -1,10 +1,10 @@
 import express, {Express} from "express";
 import DashboardPersistence from "./database/dashboardPersistence";
-import {blockValidatorHash, validTypes} from "./utils";
+import {blockUpdateValidatorHash, blockValidatorHash, validTypes} from "./utils";
 import swaggerUi from "swagger-ui-express";
 import * as swaggerDocument from "./swagger.json";
 import BlockPersistence from "./database/BlockPersistence";
-import {TextValidator, CalloutValidator, UserValidator, PageValidator} from "./schemaValidation";
+import {TextValidator, CalloutValidator, UserValidator, PageValidator, UpdatePageValidator} from "./schemaValidation";
 import PagePersistence from "./database/PagePersistence";
 import UserPersistence from "./database/UserPersistence";
 
@@ -101,7 +101,7 @@ app.get("/blocks/:blockId", async (req, res) => {
     }
 });
 
-app.put("/blocks/:blockId", async (req, res) => {
+app.put("/blocks/:blockId", validateUpdateBlockRequest(), async (req, res) => {
     let result
     try {
         result = await BlockPersistence.updateBlock({_id: req.params.blockId}, req.body);
@@ -178,6 +178,13 @@ app.get("/pages", async (req, res) => {
 })
 
 app.put("/pages/:pageId", async (req, res) => {
+    try {
+      UpdatePageValidator.parse(req.body)
+    }
+    catch (err: any) {
+        console.log("invalid request body: ", err.message)
+        return res.sendStatus(500)
+    }
     let result
     try {
         result = await PagePersistence.updatePage({_id: req.params.pageId}, req.body)
@@ -279,6 +286,21 @@ function validateBlockRequest() {
     }
 }
 
+function validateUpdateBlockRequest() {
+    return (req: any, res: any, next: any) => {
+        if (req.body.type == undefined) {
+            return res.sendStatus(400)
+        }
+        try {
+            blockUpdateValidatorHash.get(req.body.type)?.parse(req.body)
+        } catch (err: any) {
+            console.log("invalid request body: ", err.message)
+            return res.sendStatus(400)
+        }
+        next()
+    }
+}
+
 function authorize() {
     return async (req: any, res: any, next: any) => {
         const header = req.headers.authorization;
@@ -291,7 +313,6 @@ function authorize() {
         const credentials = Buffer.from(base64Credentials, "base64").toString("ascii");
         const [email, password] = credentials.split(":");
         if (await checkCredentials(email, password)) {
-            console.log("FUNCIONA?")
             next();
         } else {
             console.log("authentication failed: incorrect username or password")
