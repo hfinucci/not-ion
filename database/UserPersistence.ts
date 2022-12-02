@@ -1,5 +1,8 @@
 import {Schema} from "mongoose";
 import mongoose from "./mongoconfig";
+import BlockPersistence from "./BlockPersistence";
+import DashboardPersistence from "./dashboardPersistence";
+import PagePersistence from "./PagePersistence";
 
 const bcrypt = require('bcrypt');
 
@@ -34,5 +37,24 @@ export default class UserPersistence {
 
     static async getPasswordByEmail(name: string) {
         return await UserPersistence.user.findOne({email: name}).exec()
+    }
+
+    static async deleteUser(json: object) {
+        let user = await UserPersistence.user.findOneAndDelete(json).clone()
+
+        console.log("USER: ", user)
+        for(let i = 0; i < user.pages.length; i++) {
+            await PagePersistence.deletePage({_id: user.pages[i]})
+        }
+
+        return user
+    }
+
+    static async addPagesUser(json: object, id: Schema.Types.ObjectId) {
+        return await UserPersistence.user.findOneAndUpdate(json, {$push: {pages: id}})
+    }
+
+    static async removePagesUser(json: object, id: Schema.Types.ObjectId) {
+        return await UserPersistence.user.findOneAndUpdate(json, {$pull: {pages: id}})
     }
 }

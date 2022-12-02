@@ -38,6 +38,19 @@ app.post("/users", validateUserRequest(), async (req, res) => {
     res.status(201).send({_id: user._id});
 })
 
+app.delete("/users/:userId", async (req, res) => {
+    try {
+        let user = await UserPersistence.deleteUser({_id: req.params.userId})
+        console.log(user)
+    } catch (err: any) {
+        console.log(err.message)
+        res.sendStatus(500)
+        return
+    }
+
+    res.sendStatus(204);
+})
+
 
 app.post("/blocks", validateBlockRequest(), authorize(), async (req, res) => {
 
@@ -151,6 +164,18 @@ app.post("/pages", validatePageRequest(), async (req, res) => {
         try {
             page = await PagePersistence.createPage(req.body)
         } catch (err: any) {
+            res.sendStatus(500)
+            return
+        }
+        try {
+            let result = await UserPersistence.addPagesUser({_id: req.body.properties.created_by}, page._id)
+            if (result == null) {
+                await PagePersistence.deletePage({_id: page._id})
+                res.status(404).send("User not found")
+                return
+            }
+        } catch (err: any) {
+            await PagePersistence.deletePage({_id: page._id})
             res.sendStatus(500)
             return
         }
