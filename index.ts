@@ -35,9 +35,17 @@ app.post("/blocks", validateRequest(), async (req, res) => {
     }
 
     try {
+      await PagePersistence.addContentPage({_id: req.body.parent.id}, block._id)
+    } catch(err: any) {
+      console.log("error en el try/catch 2: ", err.message)
+      res.sendStatus(500)
+      return
+    }
+
+    try {
       await DashboardPersistence.incrementValue(req.body.type, 1)
     } catch(err) {
-      console.log("error en el try/catch 2")
+      console.log("error en el try/catch 3")
       res.sendStatus(500)
       return
     }
