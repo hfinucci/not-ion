@@ -1,10 +1,10 @@
 import express, { Express } from "express";
 import DashboardPersistence from "./database/dashboardPersistence";
-import {validatorHash, validTypes} from "./utils";
+import {blockValidatorHash, validTypes} from "./utils";
 import swaggerUi from "swagger-ui-express";
 import * as swaggerDocument from "./swagger.json";
 import BlockPersistence from "./database/BlockPersistence";
-import { TextValidator, CalloutValidator } from "./schemaValidation";
+import {TextValidator, CalloutValidator, UserValidator} from "./schemaValidation";
 import PagePersistence from "./database/PagePersistence";
 
 const app: Express = express();
@@ -22,7 +22,21 @@ app.get("/dashboard", async (req, res) => {
   res.status(200).send(result);
 });
 
-app.post("/blocks", validateRequest(), async (req, res) => {
+
+
+app.post("/users", validateUserRequest(),  async (req, res) => {
+  let user;
+  try {
+    user = await BlockPersistence.createUser(req.body);
+  } catch (err: any) {
+    console.log("error en crear el usuario: ", err.message);
+    res.sendStatus(500);
+    return
+  }
+  res.status(201).send({_id: user._id});
+})
+
+app.post("/blocks", validateBlockRequest(), async (req, res) => {
 
   let block;
   if (validTypes.includes(req.body.type)) {
@@ -195,16 +209,27 @@ app.listen(port, () => {
   console.log("listening on port 8000...");
 });
 
+function validateUserRequest() {
+  return (req: any, res: any, next: any) => {
+    try {
+      UserValidator.parse(req.body);
+    } catch(err: any) {
+      console.log("invalid request body: ", err.message)
+        return res.sendStatus(400)
+    }
+    next()
+  }
+}
 
-function validateRequest() {
+function validateBlockRequest() {
   return (req: any, res: any, next: any) => {
     if (req.body.type == undefined) {
       return res.sendStatus(400)
     }
     try {
-      const validatorResponse = validatorHash.get(req.body.type)?.parse(req.body)
-    } catch(err) {
-      console.log("invalid request body mira vos")
+      blockValidatorHash.get(req.body.type)?.parse(req.body)
+    } catch(err: any) {
+      console.log("invalid request body: ", err.message)
       return res.sendStatus(400)
     }
     next()

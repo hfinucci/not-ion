@@ -4,13 +4,13 @@ import {
     ImageValidator,
     ListValidator,
     TextValidator,
-    TodoValidator
+    TodoValidator,
 } from "./schemaValidation";
 import {ZodObject} from "zod";
 
 const validTypes = ["text", "h1", "h2", "h3", "quote", "callout", "bullet", "toggle", "todo", "image", "equation"]
 
-const validatorHash = new Map<string, ZodObject<any>>([
+const blockValidatorHash = new Map<string, ZodObject<any>>([
     ["text", TextValidator],
     ["h1", TextValidator],
     ["h2", TextValidator],
@@ -25,4 +25,4 @@ const validatorHash = new Map<string, ZodObject<any>>([
 ])
 
 
-export { validTypes, validatorHash }
+export { validTypes, blockValidatorHash }

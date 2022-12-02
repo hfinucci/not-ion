@@ -3,6 +3,13 @@ import {z} from "zod";
 const HIGHLIGHT_COLORS = z.enum(["default", "white", "red", "green", "blue", "yellow", "black"])
 const TEXT_COLOR = z.enum(["default", "white", "red", "green", "blue", "yellow", "black"])
 
+const UserValidator = z.object({
+    name: z.string(),
+    email: z.string(),
+    password: z.string(),
+    pages: z.array(z.string())
+})
+
 const TextValidator = z.object({
         type: z.string(),
         properties: z.object({
@@ -87,4 +94,4 @@ const EquationValidator = z.object({
     })
 })
 
-export {TextValidator, CalloutValidator, ListValidator, TodoValidator, ImageValidator, EquationValidator}
+export { UserValidator, TextValidator, CalloutValidator, ListValidator, TodoValidator, ImageValidator, EquationValidator}
