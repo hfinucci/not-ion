@@ -63,6 +63,29 @@
                 }
             }
         },
+        "/users/{id}": {
+            "delete": {
+                "tags": ["User"],
+                "description": "Delete a user",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "User deleted"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
         "/pages" : {
             "post": {
                 "tags": ["Pages"],
