@@ -38,16 +38,187 @@
         }
     ],
     "paths": {
+        "/users": {
+            "post": {
+                "tags": ["User"],
+                "description": "Create a new user",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "body",
+                        "description": "user",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "User created"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
         "/pages" : {
             "post": {
                 "tags": ["Pages"],
                 "description": "Create a new page",
                 "parameters": [
-
+                    {
+                        "name": "page",
+                        "in": "body",
+                        "description": "Create a new page",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/NewPage"
+                        }
+                    }
                 ],
                 "responses": {
                     "201": {
-                        "description": "Dashboard created"
+                        "description": "Page created"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            },
+            "get": {
+                "tags": ["Pages"],
+                "description": "Get all pages",
+                "responses": {
+                    "200": {
+                        "description": "Pages found"
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/pages/{id}": {
+            "get": {
+                "tags": ["Pages"],
+                "description": "Get a page by id",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Page id",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Page found"
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Page not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            },
+            "put": {
+                "tags": ["Pages"],
+                "description": "Update a page by id",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Page id",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "page",
+                        "in": "body",
+                        "description": "Update a page",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "title": {
+                                    "type": "string"
+                                },
+                                "icon": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Page updated"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["Pages"],
+                "description": "Delete a page by id",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Page id",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Page deleted"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
+                }
+            }
+        },
+        "/pages/user/{userId}": {
+            "get": {
+                "tags": ["Pages"],
+                "description": "Get all pages by user id",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "User id",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Pages found"
+                    },
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "500": {
+                        "description": "Internal server error"
                     }
                 }
             }
@@ -93,10 +264,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Block response",
-                        "schema": {
-                            "$ref": "#/definitions/Block"
-                        }
+                        "description": "Block response"
                     },
                     "404": {
                         "description": "Block not found"
@@ -105,6 +273,99 @@
                         "description": "Internal server error"
                     }
 
+                }
+            },
+            "put": {
+                "tags": [
+                    "Blocks"
+                ],
+                "description": "Update block by id",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of block to be updated",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "block",
+                        "in": "body",
+                        "description": "Block to be updated",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "type": {
+                                    "type": "string",
+                                    "example": "text",
+                                    "enum": [
+                                        "text",
+                                        "h1",
+                                        "h2",
+                                        "h3",
+                                        "quote",
+                                        "callout",
+                                        "bullet",
+                                        "toggle",
+                                        "todo",
+                                        "image",
+                                        "equation"
+                                    ]
+                                },
+                                "properties": {
+                                    "properties": {
+                                        "type_face": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "enum": ["bold", "italic", "underline"]
+                                            }
+                                        },
+                                        "color": {
+                                            "type": "string",
+                                            "enum": ["default", "grey", "brown", "orange", "yellow", "green", "blue", "purple", "pink", "red"]
+                                        },
+                                        "highlight": {
+                                            "type": "string",
+                                            "enum": ["default", "grey", "brown", "orange", "yellow", "green", "blue", "purple", "pink", "red"]
+                                        },
+                                        "icon": {
+                                            "type": "string",
+                                            "example": "light bulb"
+                                        },
+                                        "checked": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "caption": {
+                                            "type": "string",
+                                            "example": "This is a caption"
+                                        },
+                                        "align": {
+                                            "type": "string",
+                                            "enum": ["left", "center", "right"]
+                                        }
+                                    }
+                                },
+                                "value": {
+                                    "type": "string",
+                                    "example": "This is a value"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Block updated"
+                    },
+                    "404": {
+                        "description": "Block not found"
+                    },
+                    "500": {
+                        "description": "Internal server error"
+                    }
                 }
             },
             "delete": {
@@ -155,6 +416,77 @@
         }
     },
     "definitions": {
+        "User": {
+            "required": [
+                "name",
+                "email",
+                "password"
+            ],
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "example": "John Doe"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "johndoes@itba.edu.ar"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "123456"
+                }
+            }
+        },
+        "Page": {
+            "type": "object",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/NewPage"
+                },
+                {
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        }
+                    }
+                }
+            ]
+        },
+        "NewPage": {
+            "required": ["type", "title", "created_by"],
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "default": "page",
+                    "enum": ["page"]
+                },
+                "properties": {
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "type": "string",
+                            "example": "untitled"
+                        },
+                        "icon": {
+                            "type": "string",
+                            "example": "untitled"
+                        },
+                        "created_by": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "content": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": []
+                }
+            }
+        },
         "Block": {
             "type": "object",
             "allOf": [
@@ -179,7 +511,21 @@
             "type": "object",
             "properties": {
                 "type": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "text",
+                    "enum": [
+                        "text",
+                        "h1",
+                        "h2",
+                        "h3",
+                        "quote",
+                        "callout",
+                        "bullet",
+                        "toggle",
+                        "todo",
+                        "image",
+                        "equation"
+                    ]
                 },
                 "properties": {
                     "type": "object",

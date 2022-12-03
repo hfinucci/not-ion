@@ -98,6 +98,7 @@ app.post("/blocks", validateBlockRequest(), authorize(), async (req, res) => {
     res.status(201).send({_id: block._id});
 });
 
+// TODO: Fix this function call in swagger
 app.get("/blocks/:blockId", async (req, res) => {
     let result
     try {
@@ -202,6 +203,7 @@ app.get("/pages", async (req, res) => {
     }
 })
 
+// TODO: Modify validator to make title and icon optionals
 app.put("/pages/:pageId", async (req, res) => {
     try {
       UpdatePageValidator.parse(req.body)
@@ -218,7 +220,7 @@ app.put("/pages/:pageId", async (req, res) => {
         res.sendStatus(500)
         return
     }
-    res.status(200).send(result)
+    res.status(200)
 })
 
 app.get("/pages/:pageId", async (req, res) => {
