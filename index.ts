@@ -108,7 +108,7 @@ app.get("/blocks/:blockId", async (req, res) => {
         return
     }
     if (result == null) {
-        res.sendStatus(204)
+        res.sendStatus(404)
     } else {
         res.status(200)
     }
@@ -145,12 +145,12 @@ app.delete("/blocks/:blockId", async (req, res) => {
         await BlockPersistence.removeContentBlock({_id: block.parent.id}, block._id)
       }
     } catch(err: any){
-      console.log("error en el try/catch 3", err.message)
+      console.log("error removing block from parent", err.message)
       res.sendStatus(500)
       return
     }
   } catch(err: any) {
-    console.log("error en el try/catch 1", err.message)
+    console.log("error deleting block", err.message)
     res.sendStatus(500)
     return
   }
@@ -241,6 +241,13 @@ app.delete("/pages/:pageId", async (req, res) => {
     try {
         let page = await PagePersistence.deletePage({_id: req.params.pageId})
         console.log(page)
+        try {
+            await UserPersistence.removePagesUser({_id: page.properties.created_by}, page._id)
+        } catch (err: any) {
+            console.log("error updating user's pages: ", err.message)
+            res.sendStatus(500)
+            return
+        }
     } catch (err: any) {
         console.log(err.message)
         res.sendStatus(500)
