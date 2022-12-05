@@ -10,6 +10,7 @@ import UserPersistence from "./database/UserPersistence";
 
 const bcrypt = require('bcrypt');
 
+
 const app: Express = express();
 const port = 8000;
 const bodyParser = require("body-parser");
