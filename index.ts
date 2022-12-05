@@ -43,7 +43,7 @@ app.delete("/users/:userId", authorize(), async (req, res) => {
         let user = await UserPersistence.deleteUser({_id: req.params.userId})
         console.log(user)
     } catch (err: any) {
-        console.log(err.message)
+        console.log("error deleting user: ", err.message)
         res.sendStatus(500)
         return
     }
@@ -78,7 +78,7 @@ app.post("/blocks", validateBlockRequest(), authorize(), async (req, res) => {
                 return
             }
         } catch (err: any) {
-            console.log("error en el try/catch 2: ", err.message)
+            console.log("error adding reference to page/block: ", err.message)
             await BlockPersistence.deleteBlock({_id: block._id})
             res.sendStatus(500)
             return
@@ -86,8 +86,8 @@ app.post("/blocks", validateBlockRequest(), authorize(), async (req, res) => {
 
         try {
             await DashboardPersistence.incrementValue(req.body.type, 1)
-        } catch (err) {
-            console.log("error en el try/catch 3")
+        } catch (err: any) {
+            console.log("error updating dashboard: ", err.message)
             res.sendStatus(500)
             return
         }
@@ -98,13 +98,12 @@ app.post("/blocks", validateBlockRequest(), authorize(), async (req, res) => {
     res.status(201).send({_id: block._id});
 });
 
-// TODO: Fix this function call in swagger
 app.get("/blocks/:blockId", async (req, res) => {
     let result
     try {
         result = await BlockPersistence.getBlock({_id: req.params.blockId});
     } catch (err: any) {
-        console.log("error en el try/catch 3: ", err.message)
+        console.log("failed to retrieve block: ", err.message)
         res.sendStatus(500)
         return
     }
@@ -139,19 +138,18 @@ app.delete("/blocks/:blockId", authorize(), async (req, res) => {
       return
     }
     try {
-      console.log("BLOCK: ", block)
       if (block.parent.type === "page") {
         await PagePersistence.removeContentPage({_id: block.parent.id}, block._id)
       } else {
         await BlockPersistence.removeContentBlock({_id: block.parent.id}, block._id)
       }
     } catch(err: any){
-      console.log("error removing block from parent", err.message)
+      console.log("error removing block from parent: ", err.message)
       res.sendStatus(500)
       return
     }
   } catch(err: any) {
-    console.log("error deleting block", err.message)
+    console.log("error deleting block: ", err.message)
     res.sendStatus(500)
     return
   }
@@ -159,12 +157,13 @@ app.delete("/blocks/:blockId", authorize(), async (req, res) => {
     res.sendStatus(204);
 });
 
-app.post("/pages", validatePageRequest(), authorize(), async (req, res) => {
+app.post("/pages", authorize(), validatePageRequest(), async (req, res) => {
     if (req.body.type == "page") {
         let page;
         try {
             page = await PagePersistence.createPage(req.body)
         } catch (err: any) {
+            console.log("error creating page: ", err.message)
             res.sendStatus(500)
             return
         }
@@ -176,6 +175,7 @@ app.post("/pages", validatePageRequest(), authorize(), async (req, res) => {
                 return
             }
         } catch (err: any) {
+            console.log("error adding page reference to user: ", err.message)
             await PagePersistence.deletePage({_id: page._id})
             res.sendStatus(500)
             return
@@ -192,9 +192,8 @@ app.get("/pages", async (req, res) => {
     try {
         result = await PagePersistence.getPages()
     } catch (err: any) {
-        console.log(err.message)
-        res.sendStatus(500)
-        return
+        console.log("failed to retrieve pages: ",err.message)
+        return res.sendStatus(500)
     }
     if (result == null) {
         res.sendStatus(204)
@@ -203,18 +202,18 @@ app.get("/pages", async (req, res) => {
     }
 })
 
-// TODO: Modify validator to make title and icon optionals
 app.put("/pages/:pageId", authorize(), async (req, res) => {
     try {
       UpdatePageValidator.parse(req.body)
     }
     catch (err: any) {
-        return res.sendStatus(500)
+        console.log("error updating page: ", err.message)
+        return res.sendStatus(400)
     }
     try {
         await PagePersistence.updatePage({_id: req.params.pageId}, req.body)
     } catch (err: any) {
-        console.log(err.message)
+        console.log("failed to update page: ", err.message)
         return res.sendStatus(500)
     }
     res.sendStatus(200)
@@ -225,9 +224,8 @@ app.get("/pages/:pageId", async (req, res) => {
     try {
         result = await PagePersistence.getPage({_id: req.params.pageId});
     } catch (err: any) {
-        console.log("error en el try/catch: ", err.message)
-        res.sendStatus(500)
-        return
+        console.log("failed to retrieve page: ", err.message)
+        return res.sendStatus(500)
     }
     if (result == null) {
         res.sendStatus(204)
@@ -244,13 +242,11 @@ app.delete("/pages/:pageId", authorize(), async (req, res) => {
             await UserPersistence.removePagesUser({_id: page.properties.created_by}, page._id)
         } catch (err: any) {
             console.log("error updating user's pages: ", err.message)
-            res.sendStatus(500)
-            return
+            return res.sendStatus(500)
         }
     } catch (err: any) {
-        console.log(err.message)
-        res.sendStatus(500)
-        return
+        console.log("error deleting page: ", err.message)
+        return res.sendStatus(500)
     }
 
     res.sendStatus(204);
@@ -261,9 +257,8 @@ app.get("/pages/user/:userId", async (req, res) => {
     try {
         result = await PagePersistence.getPagesByUser(req.params.userId)
     } catch (err: any) {
-        console.log(err.message)
-        res.sendStatus(500)
-        return
+        console.log("error retrieving pages: ", err.message)
+        return res.sendStatus(500)
     }
     if (result == null || result.length == 0) {
         res.sendStatus(204)
@@ -335,7 +330,6 @@ function validateUpdateBlockRequest() {
 function authorize() {
     return async (req: any, res: any, next: any) => {
         const header = req.headers.authorization;
-        console.log(header)
         if (!header?.startsWith("Basic ")) {
             console.log("authentication failed: incorrect authentication header");
             return res.sendStatus(401)
