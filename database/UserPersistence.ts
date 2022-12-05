@@ -35,7 +35,7 @@ export default class UserPersistence {
         return await UserPersistence.user.create(json)
     }
 
-    static async getPasswordByEmail(name: string) {
+    static async getUserByEmail(name: string) {
         return await UserPersistence.user.findOne({email: name}).exec()
     }
 

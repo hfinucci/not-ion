@@ -4,7 +4,7 @@ import {blockUpdateValidatorHash, blockValidatorHash, validTypes} from "./utils"
 import swaggerUi from "swagger-ui-express";
 import * as swaggerDocument from "./swagger.json";
 import BlockPersistence from "./database/BlockPersistence";
-import {TextValidator, CalloutValidator, UserValidator, PageValidator, UpdatePageValidator} from "./schemaValidation";
+import {UserValidator, PageValidator, UpdatePageValidator} from "./schemaValidation";
 import PagePersistence from "./database/PagePersistence";
 import UserPersistence from "./database/UserPersistence";
 
@@ -39,7 +39,7 @@ app.post("/users", validateUserRequest(), async (req, res) => {
     res.status(201).send({_id: user._id});
 })
 
-app.delete("/users/:userId", authorize(), async (req, res) => {
+app.delete("/users/:userId", authorize(false, true), async (req, res) => {
     try {
         let user = await UserPersistence.deleteUser({_id: req.params.userId})
         console.log(user)
@@ -203,7 +203,7 @@ app.get("/pages", async (req, res) => {
     }
 })
 
-app.put("/pages/:pageId", authorize(), async (req, res) => {
+app.put("/pages/:pageId", authorize(true), async (req, res) => {
     try {
       UpdatePageValidator.parse(req.body)
     }
@@ -235,7 +235,7 @@ app.get("/pages/:pageId", async (req, res) => {
     }
 })
 
-app.delete("/pages/:pageId", authorize(), async (req, res) => {
+app.delete("/pages/:pageId", authorize(true), async (req, res) => {
     try {
         let page = await PagePersistence.deletePage({_id: req.params.pageId})
         console.log(page)
@@ -328,8 +328,14 @@ function validateUpdateBlockRequest() {
     }
 }
 
-function authorize() {
+function authorize(page?: boolean, user?: boolean) {
     return async (req: any, res: any, next: any) => {
+        let id
+        if(user){
+           id = req.params.userId
+        } else if(page) {
+            id = req.params.pageId
+        }
         const header = req.headers.authorization;
         if (!header?.startsWith("Basic ")) {
             console.log("authentication failed: incorrect authentication header");
@@ -338,7 +344,7 @@ function authorize() {
         const base64Credentials = header.split(" ")[1];
         const credentials = Buffer.from(base64Credentials, "base64").toString("ascii");
         const [email, password] = credentials.split(":");
-        if (await checkCredentials(email, password)) {
+        if (await checkCredentials(email, password, id, user, page)) {
             next();
         } else {
             console.log("authentication failed: incorrect username or password")
@@ -347,10 +353,31 @@ function authorize() {
     }
 }
 
-async function checkCredentials(email: string, password: string): Promise<boolean> {
-    const userObject = await UserPersistence.getPasswordByEmail(email)
+async function checkCredentials(email: string, password: string, id?: string, user?: boolean, pageBool?: boolean): Promise<boolean> {
+    const userObject = await UserPersistence.getUserByEmail(email)
+    console.log(email)
+    console.log(password)
+    console.log(id)
+    console.log(user)
+    console.log(pageBool)
     try {
-        return await bcrypt.compare(password, userObject.password)
+        const validated =  await bcrypt.compare(password, userObject.password)
+        if (validated == undefined || !validated) {
+            return false
+        }
+        if (pageBool) {
+            const page = await PagePersistence.getPage({_id: id})
+            console.log(page.properties.created_by)
+            console.log(userObject._id)
+            if (page.properties.created_by.toString() != userObject._id.toString()) {
+                return false
+            }
+        }
+        if (user) {
+            if(id !== userObject._id.toString())
+                return false
+        }
+        return true
     } catch (err: any) {
         return false
     }
