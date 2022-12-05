@@ -31,7 +31,7 @@ export default class BlockPersistence {
       caption: String,
       align: {
         type: String,
-        default: "center",
+        enum: ["center", "left", "right"]
       },
     },
     content: [String],

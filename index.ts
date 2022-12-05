@@ -15,7 +15,7 @@ const port = 8000;
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 
-app.post("/dashboard", async (req, res) => {
+app.post("/dashboard", authorize(), async (req, res) => {
     await DashboardPersistence.createDashboard();
     res.sendStatus(201);
 });
@@ -38,7 +38,7 @@ app.post("/users", validateUserRequest(), async (req, res) => {
     res.status(201).send({_id: user._id});
 })
 
-app.delete("/users/:userId", async (req, res) => {
+app.delete("/users/:userId", authorize(), async (req, res) => {
     try {
         let user = await UserPersistence.deleteUser({_id: req.params.userId})
         console.log(user)
@@ -111,11 +111,11 @@ app.get("/blocks/:blockId", async (req, res) => {
     if (result == null) {
         res.sendStatus(404)
     } else {
-        res.status(200)
+        res.status(200).send(result)
     }
 });
 
-app.put("/blocks/:blockId", validateUpdateBlockRequest(), async (req, res) => {
+app.put("/blocks/:blockId", authorize(), validateUpdateBlockRequest(), async (req, res) => {
     let result
     try {
         result = await BlockPersistence.updateBlock({_id: req.params.blockId}, req.body);
@@ -124,10 +124,10 @@ app.put("/blocks/:blockId", validateUpdateBlockRequest(), async (req, res) => {
         res.sendStatus(500)
         return
     }
-    res.status(200)
+    res.sendStatus(200)
 });
 
-app.delete("/blocks/:blockId", async (req, res) => {
+app.delete("/blocks/:blockId", authorize(), async (req, res) => {
 
   try {
     let block = await BlockPersistence.deleteBlock({_id: req.params.blockId})
@@ -159,7 +159,7 @@ app.delete("/blocks/:blockId", async (req, res) => {
     res.sendStatus(204);
 });
 
-app.post("/pages", validatePageRequest(), async (req, res) => {
+app.post("/pages", validatePageRequest(), authorize(), async (req, res) => {
     if (req.body.type == "page") {
         let page;
         try {
@@ -204,23 +204,20 @@ app.get("/pages", async (req, res) => {
 })
 
 // TODO: Modify validator to make title and icon optionals
-app.put("/pages/:pageId", async (req, res) => {
+app.put("/pages/:pageId", authorize(), async (req, res) => {
     try {
       UpdatePageValidator.parse(req.body)
     }
     catch (err: any) {
-        console.log("invalid request body: ", err.message)
         return res.sendStatus(500)
     }
-    let result
     try {
-        result = await PagePersistence.updatePage({_id: req.params.pageId}, req.body)
+        await PagePersistence.updatePage({_id: req.params.pageId}, req.body)
     } catch (err: any) {
         console.log(err.message)
-        res.sendStatus(500)
-        return
+        return res.sendStatus(500)
     }
-    res.status(200)
+    res.sendStatus(200)
 })
 
 app.get("/pages/:pageId", async (req, res) => {
@@ -239,7 +236,7 @@ app.get("/pages/:pageId", async (req, res) => {
     }
 })
 
-app.delete("/pages/:pageId", async (req, res) => {
+app.delete("/pages/:pageId", authorize(), async (req, res) => {
     try {
         let page = await PagePersistence.deletePage({_id: req.params.pageId})
         console.log(page)

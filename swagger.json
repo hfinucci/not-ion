@@ -336,40 +336,36 @@
                                         "equation"
                                     ]
                                 },
-                                "properties": {
-                                    "properties": {
-                                        "type_face": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "string",
-                                                "enum": ["bold", "italic", "underline"]
-                                            }
-                                        },
-                                        "color": {
-                                            "type": "string",
-                                            "enum": ["default", "grey", "brown", "orange", "yellow", "green", "blue", "purple", "pink", "red"]
-                                        },
-                                        "highlight": {
-                                            "type": "string",
-                                            "enum": ["default", "grey", "brown", "orange", "yellow", "green", "blue", "purple", "pink", "red"]
-                                        },
-                                        "icon": {
-                                            "type": "string",
-                                            "example": "light bulb"
-                                        },
-                                        "checked": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "caption": {
-                                            "type": "string",
-                                            "example": "This is a caption"
-                                        },
-                                        "align": {
-                                            "type": "string",
-                                            "enum": ["left", "center", "right"]
-                                        }
+                                "type_face": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "enum": ["bold", "italic", "underline"]
                                     }
+                                },
+                                "color": {
+                                    "type": "string",
+                                    "enum": ["default", "grey", "brown", "orange", "yellow", "green", "blue", "purple", "pink", "red"]
+                                },
+                                "highlight": {
+                                    "type": "string",
+                                    "enum": ["default", "grey", "brown", "orange", "yellow", "green", "blue", "purple", "pink", "red"]
+                                },
+                                "icon": {
+                                    "type": "string",
+                                    "example": "light bulb"
+                                },
+                                "checked": {
+                                    "type": "boolean",
+                                    "example": true
+                                },
+                                "caption": {
+                                    "type": "string",
+                                    "example": "This is a caption"
+                                },
+                                "align": {
+                                    "type": "string",
+                                    "enum": ["left", "center", "right"]
                                 },
                                 "value": {
                                     "type": "string",
