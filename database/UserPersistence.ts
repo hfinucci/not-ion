@@ -43,7 +43,6 @@ export default class UserPersistence {
     static async deleteUser(json: object) {
         let user = await UserPersistence.user.findOneAndDelete(json).clone()
 
-        console.log("USER: ", user)
         for(let i = 0; i < user.pages.length; i++) {
             await PagePersistence.deletePage({_id: user.pages[i]})
         }

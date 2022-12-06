@@ -37,7 +37,6 @@ export default class PagePersistence {
     static page = mongoose.model("page", this.pageSchema)
 
     static async createPage(json: object) {
-        console.log("en el create")
         return await PagePersistence.page.create(json)
     }
 
@@ -52,8 +51,6 @@ export default class PagePersistence {
     static async deletePage(json: object) {
         let page = await PagePersistence.page.findOneAndDelete(json,
         ).clone()
-
-        console.log("PAGE: ", page)
 
         for(let i = 0; i < page.content.length; i++) {
             let deleteBlock = await BlockPersistence.deleteBlock({_id: page.content[i]})

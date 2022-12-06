@@ -19,7 +19,6 @@ const PageValidator = z.object({
         icon: z.string(),
         created_by: z.string()
     }),
-    content: z.array(z.string())
 }).strict()
 
 const UpdatePageValidator = z.object({
@@ -67,6 +66,7 @@ const CalloutValidator = z.object({
 ).strict()
 
 const UpdateCalloutValidator = z.object({
+    type: z.string(),
     type_face: z.array(TYPE_FACE),
     color: TEXT_COLOR,
     highlight: HIGHLIGHT_COLORS,
@@ -81,7 +81,6 @@ const ListValidator = z.object({
         color: TEXT_COLOR,
         highlight: HIGHLIGHT_COLORS,
     }),
-    content: z.array(z.string()),
     value: z.string(),
     parent: z.object({
         id: z.string().min(24).max(24),
@@ -90,6 +89,7 @@ const ListValidator = z.object({
 }).strict()
 
 const UpdateListValidator = z.object({
+    type: z.string(),
     type_face: z.array(TYPE_FACE),
     color: TEXT_COLOR,
     highlight: HIGHLIGHT_COLORS,
@@ -104,7 +104,6 @@ const TodoValidator = z.object({
         highlight: HIGHLIGHT_COLORS,
         checked: z.boolean()
     }),
-    content: z.array(z.string()),
     value: z.string(),
     parent: z.object({
         id: z.string().min(24).max(24),
@@ -113,6 +112,7 @@ const TodoValidator = z.object({
 }).strict()
 
 const UpdateTodoValidator = z.object({
+    type: z.string(),
     type_face: z.array(TYPE_FACE),
     color: TEXT_COLOR,
     highlight: HIGHLIGHT_COLORS,
@@ -134,6 +134,7 @@ const ImageValidator = z.object({
 }).strict()
 
 const UpdateImageValidator = z.object({
+    type: z.string(),
     caption: z.string(),
     align: ALIGN,
     value: z.string(),
@@ -149,6 +150,7 @@ const EquationValidator = z.object({
 }).strict()
 
 const UpdateEquationValidator = z.object({
+    type: z.string(),
     value: z.string(),
 }).strict()
 

@@ -64,7 +64,6 @@ export default class BlockPersistence {
 
   static async updateBlock(id: any, json: any) {
     delete json["type"]
-    console.log(json)
     const res = Object.fromEntries(Object.entries(json).map(([key, value]) => {
       if(key != "value")
         return ['properties.'+key, value]
@@ -90,7 +89,7 @@ export default class BlockPersistence {
 
   static async deleteBlockRecursive(json: object) {
     const block = await BlockPersistence.getBlock(json);
-    if(block.content.length > 0) {
+    if(block.content != null && block.content.length > 0) {
       for(let i = 0; i < block.content.length; i++) {
         let deletedBlock = await BlockPersistence.deleteBlockRecursive({_id: block.content[i]});
         await DashboardPersistence.incrementValue(deletedBlock.type, -1)

@@ -18,7 +18,7 @@ app.use(bodyParser.json());
 
 app.post("/dashboard", authorize(), async (req, res) => {
     await DashboardPersistence.createDashboard();
-    res.sendStatus(201);
+    res.status(201).send("Dashboard created");
 });
 
 app.get("/dashboard", async (req, res) => {
@@ -46,7 +46,7 @@ app.delete("/users/:userId", authorize(false, true), async (req, res) => {
         console.log("error deleting user: ", err.message)
         return res.sendStatus(500)
     }
-    res.sendStatus(204);
+    res.status(204).send("User deleted");
 })
 
 
@@ -89,7 +89,7 @@ app.post("/blocks", validateBlockRequest(), authorize(), async (req, res) => {
             return
         }
     } else {
-        res.sendStatus(400);
+        res.status(400).send("Invalid block type");
         return;
     }
     res.status(201).send({_id: block._id});
@@ -105,22 +105,21 @@ app.get("/blocks/:blockId", async (req, res) => {
         return
     }
     if (result == null) {
-        res.sendStatus(404)
+        res.status(404).send("Block not found");
     } else {
         res.status(200).send(result)
     }
 });
 
 app.put("/blocks/:blockId", authorize(), validateUpdateBlockRequest(), async (req, res) => {
-    let result
     try {
-        result = await BlockPersistence.updateBlock({_id: req.params.blockId}, req.body);
+        await BlockPersistence.updateBlock({_id: req.params.blockId}, req.body);
     } catch (err: any) {
         console.log("error updating block: ", err.message)
         res.sendStatus(500)
         return
     }
-    res.sendStatus(200)
+    res.status(200).send("Block updated");
 });
 
 app.delete("/blocks/:blockId", authorize(), async (req, res) => {
@@ -151,7 +150,7 @@ app.delete("/blocks/:blockId", authorize(), async (req, res) => {
     return
   }
 
-    res.sendStatus(204);
+    res.status(204).send("Block deleted");
 });
 
 app.post("/pages", authorize(), validatePageRequest(), async (req, res) => {
@@ -179,7 +178,7 @@ app.post("/pages", authorize(), validatePageRequest(), async (req, res) => {
         }
         res.status(201).send({_id: page._id});
     } else {
-        res.sendStatus(400);
+        res.status(400).send("Not a page");
         return;
     }
 })
@@ -192,8 +191,8 @@ app.get("/pages", async (req, res) => {
         console.log("failed to retrieve pages: ",err.message)
         return res.sendStatus(500)
     }
-    if (result == null) {
-        res.sendStatus(204)
+    if (result == null || result.length == 0) {
+        res.status(204).send("No pages found");
     } else {
         res.status(200).send(result)
     }
@@ -213,7 +212,7 @@ app.put("/pages/:pageId", authorize(true), async (req, res) => {
         console.log("failed to update page: ", err.message)
         return res.sendStatus(500)
     }
-    res.sendStatus(200)
+    res.status(200).send("Page updated");
 })
 
 app.get("/pages/:pageId", async (req, res) => {
@@ -225,7 +224,7 @@ app.get("/pages/:pageId", async (req, res) => {
         return res.sendStatus(500)
     }
     if (result == null) {
-        res.sendStatus(204)
+        res.status(404).send("Page not found");
     } else {
         res.status(200).send(result)
     }
@@ -234,7 +233,6 @@ app.get("/pages/:pageId", async (req, res) => {
 app.delete("/pages/:pageId", authorize(true), async (req, res) => {
     try {
         let page = await PagePersistence.deletePage({_id: req.params.pageId})
-        console.log(page)
         try {
             await UserPersistence.removePagesUser({_id: page.properties.created_by}, page._id)
         } catch (err: any) {
@@ -246,7 +244,7 @@ app.delete("/pages/:pageId", authorize(true), async (req, res) => {
         return res.sendStatus(500)
     }
 
-    res.sendStatus(204);
+    res.status(204).send("Page deleted");
 })
 
 app.get("/pages/user/:userId", async (req, res) => {
@@ -258,7 +256,7 @@ app.get("/pages/user/:userId", async (req, res) => {
         return res.sendStatus(500)
     }
     if (result == null || result.length == 0) {
-        res.sendStatus(204)
+        res.status(204).send("No pages found");
     } else {
         res.status(200).send(result)
     }
@@ -297,7 +295,7 @@ function validatePageRequest() {
 function validateBlockRequest() {
     return (req: any, res: any, next: any) => {
         if (req.body.type == undefined) {
-            return res.sendStatus(400)
+            return res.status(400).send("Block type not specified");
         }
         try {
             blockValidatorHash.get(req.body.type)?.parse(req.body)
@@ -312,7 +310,7 @@ function validateBlockRequest() {
 function validateUpdateBlockRequest() {
     return (req: any, res: any, next: any) => {
         if (req.body.type == undefined) {
-            return res.sendStatus(400)
+            return res.status(400).send("Block type not specified");
         }
         try {
             blockUpdateValidatorHash.get(req.body.type)?.parse(req.body)
@@ -343,7 +341,7 @@ function authorize(page?: boolean, user?: boolean) {
         if (await checkCredentials(email, password, id, user, page)) {
             next();
         } else {
-            console.log("authentication failed: incorrect username or password")
+            console.log("authentication failed: incorrect credentials");
             return res.sendStatus(401)
         }
     }
@@ -369,5 +367,6 @@ async function checkCredentials(email: string, password: string, id?: string, us
         return true
     } catch (err: any) {
         return false
+
     }
 }
