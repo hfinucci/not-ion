@@ -63,11 +63,12 @@ export default class BlockPersistence {
   }
 
   static async updateBlock(id: any, json: any) {
+    delete json["type"]
+    console.log(json)
     const res = Object.fromEntries(Object.entries(json).map(([key, value]) => {
       if(key != "value")
         return ['properties.'+key, value]
-      else
-        return [key, value]
+      return [key, value]
     }));
 
     return  await BlockPersistence.block.updateOne(id, {$set: res})

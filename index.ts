@@ -42,13 +42,10 @@ app.post("/users", validateUserRequest(), async (req, res) => {
 app.delete("/users/:userId", authorize(false, true), async (req, res) => {
     try {
         let user = await UserPersistence.deleteUser({_id: req.params.userId})
-        console.log(user)
     } catch (err: any) {
         console.log("error deleting user: ", err.message)
-        res.sendStatus(500)
-        return
+        return res.sendStatus(500)
     }
-
     res.sendStatus(204);
 })
 
@@ -72,7 +69,6 @@ app.post("/blocks", validateBlockRequest(), authorize(), async (req, res) => {
             } else {
                 result = await BlockPersistence.addContentBlock({_id: req.body.parent.id}, block._id)
             }
-            console.log(result)
             if (result == null) {
                 await BlockPersistence.deleteBlock({_id: block._id})
                 res.status(404).send("Parent not found")
@@ -355,11 +351,6 @@ function authorize(page?: boolean, user?: boolean) {
 
 async function checkCredentials(email: string, password: string, id?: string, user?: boolean, pageBool?: boolean): Promise<boolean> {
     const userObject = await UserPersistence.getUserByEmail(email)
-    console.log(email)
-    console.log(password)
-    console.log(id)
-    console.log(user)
-    console.log(pageBool)
     try {
         const validated =  await bcrypt.compare(password, userObject.password)
         if (validated == undefined || !validated) {
@@ -367,8 +358,6 @@ async function checkCredentials(email: string, password: string, id?: string, us
         }
         if (pageBool) {
             const page = await PagePersistence.getPage({_id: id})
-            console.log(page.properties.created_by)
-            console.log(userObject._id)
             if (page.properties.created_by.toString() != userObject._id.toString()) {
                 return false
             }

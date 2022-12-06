@@ -15,6 +15,7 @@ import {ZodObject} from "zod";
 
 const validTypes = ["text", "h1", "h2", "h3", "quote", "callout", "bullet", "toggle", "todo", "image", "equation"]
 
+// @ts-ignore
 const blockValidatorHash = new Map<string, ZodObject<any>>([
     ["text", TextValidator],
     ["h1", TextValidator],
@@ -29,6 +30,7 @@ const blockValidatorHash = new Map<string, ZodObject<any>>([
     ["equation", EquationValidator]
 ])
 
+// @ts-ignore
 const blockUpdateValidatorHash = new Map<string, ZodObject<any>>([
     ["text", UpdateTextValidator],
     ["h1", UpdateTextValidator],

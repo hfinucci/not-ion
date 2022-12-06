@@ -16,6 +16,7 @@ export default class UserPersistence {
         email: {
             type: String,
             required: true,
+            unique: true
         },
         password: {
             type: String,
