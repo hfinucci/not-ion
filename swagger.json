@@ -454,6 +454,13 @@
                 "password": {
                     "type": "string",
                     "example": "123456"
+                },
+                "pages": {
+                    "type":"array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": []
                 }
             }
         },

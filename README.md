@@ -11,6 +11,12 @@ Las funcionalidades y los esquemas de las base de datos se pueden ver en la pres
 * Tener una instancia de Redis corriendo en el puerto 6379
 * Tener una instancia de MongoDB corriendo en el puerto 27017
 
+Si se quiere utilizar contenedores de las bases de datos en Docker, ejecutar el siguiente comando dentro del root del proyecto:
+
+```bash
+docker-compose up
+```
+
 ## Ejecución
 Para correr el proyecto:
 ```bash
