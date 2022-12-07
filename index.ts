@@ -10,11 +10,19 @@ import UserPersistence from "./database/UserPersistence";
 
 const bcrypt = require('bcrypt');
 
-
 const app: Express = express();
+var cors = require('express-cors')
+ 
+
 const port = 8000;
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
+app.use(cors({
+    allowedOrigins: [
+        'github.com', 'google.com'
+    ]
+}))
+
 
 app.post("/dashboard", authorize(), async (req, res) => {
     await DashboardPersistence.createDashboard();
