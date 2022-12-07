@@ -1,5 +1,11 @@
 # not-ion
 Las funcionalidades y los esquemas de las base de datos se pueden ver en la presentación subida.
+
+## Integrantes
+* azkim
+* hfinucci
+* arfernandez
+
 ## Requisitos
 * Tener instalado Node
 * Tener una instancia de Redis corriendo en el puerto 6379
